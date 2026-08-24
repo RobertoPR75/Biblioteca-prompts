@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Índice de Prompts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4EFE1;
+    --paper-deep:#EAE2CC;
+    --ink:#1E2A38;
+    --ink-soft:#4A5568;
+    --brass:#A9822F;
+    --brass-deep:#8A6A22;
+    --teal:#2F6E64;
+    --line:#C9BFA0;
+    --card:#FBF8EF;
+    --danger:#9C4038;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  html,body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  body{min-height:100vh;}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 20px 100px;display:none;}
+  .wrap.visible{display:block;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:16px;
+    border-bottom:3px double var(--ink);
+    padding-bottom:18px;
+    margin-bottom:24px;
+  }
+  .brand-eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--brass-deep);
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:clamp(28px,4vw,40px);
+    margin:0;
+    letter-spacing:-.01em;
+  }
+  .count-plate{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:6px 12px;
+    border-radius:var(--radius);
+    white-space:nowrap;
+  }
+
+  .account-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+  }
+  .sync-status{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .sync-dot{width:7px;height:7px;border-radius:50%;background:#c9a227;flex-shrink:0;}
+  .sync-dot.online{background:var(--teal);}
+  .sync-dot.error{background:var(--danger);}
+  .account-chip{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .account-chip img{width:20px;height:20px;border-radius:50%;}
+  .account-chip button{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    padding:5px 10px;
+    border-radius:var(--radius);
+    cursor:pointer;
+  }
+  .account-chip button:hover{border-color:var(--ink);color:var(--ink);}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .toolbar button{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    background:transparent;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    padding:8px 14px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .toolbar button:hover{background:var(--ink);color:var(--paper);}
+  .toolbar .primary{background:var(--ink);color:var(--paper);}
+  .toolbar .primary:hover{background:var(--brass-deep);border-color:var(--brass-deep);}
+  #importInput{display:none;}
+
+  .catalog-controls{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    margin-bottom:26px;
+  }
+  .search-row{
+    display:flex;align-items:center;gap:10px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:14px;margin-bottom:14px;
+  }
+  .search-row svg{flex-shrink:0;color:var(--brass-deep);}
+  .search-row input{
+    flex:1;border:none;background:transparent;
+    font-family:'Inter',sans-serif;font-size:16px;color:var(--ink);outline:none;
+  }
+  .search-row input::placeholder{color:#9a917a;}
+
+  .cat-label{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:9px;
+  }
+  .chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{
+    font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;
+    border-radius:var(--radius);border:1px solid var(--line);background:var(--paper);
+    color:var(--ink-soft);cursor:pointer;transition:all .15s ease;user-select:none;
+  }
+  .chip:hover{border-color:var(--brass);}
+  .chip.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 18px 14px;position:relative;display:flex;flex-direction:column;
+    box-shadow:0 1px 0 rgba(0,0,0,.03);
+  }
+  .card::before{content:"";position:absolute;top:12px;left:14px;right:14px;border-top:1px dashed var(--line);}
+  .card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .call-number{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--brass-deep);letter-spacing:.05em;}
+  .card-cat{
+    font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;
+    letter-spacing:.08em;background:var(--teal);color:#fff;padding:3px 9px;border-radius:var(--radius);
+  }
+  .card h3{font-family:'Fraunces',serif;font-weight:600;font-size:19px;margin:0 0 8px;line-height:1.25;}
+  .card p{
+    font-size:14px;line-height:1.55;color:var(--ink-soft);margin:0 0 16px;
+    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;flex:1;
+  }
+  .card-actions{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:10px;}
+  .icon-btn{
+    flex:1;background:transparent;border:1px solid var(--line);border-radius:var(--radius);
+    padding:7px 0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;
+    color:var(--ink-soft);display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s ease;
+  }
+  .icon-btn:hover{border-color:var(--ink);color:var(--ink);}
+  .icon-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
+  .icon-btn.copied{background:var(--teal);border-color:var(--teal);color:#fff;}
+
+  .empty{text-align:center;padding:70px 20px;color:var(--ink-soft);border:1px dashed var(--line);border-radius:var(--radius);}
+  .empty h2{font-family:'Fraunces',serif;font-size:22px;color:var(--ink);margin:14px 0 6px;}
+  .empty p{margin:0;font-size:14px;}
+
+  .fab{
+    position:fixed;bottom:26px;right:26px;width:58px;height:58px;border-radius:50%;
+    background:var(--ink);color:var(--paper);border:none;font-size:28px;line-height:1;cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;
+    transition:background .15s ease, transform .15s ease;
+  }
+  .fab:hover{background:var(--brass-deep);transform:translateY(-2px);}
+
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,24,20,.55);display:none;
+    align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--paper);border:1px solid var(--ink);border-radius:var(--radius);
+    max-width:520px;width:100%;padding:26px;margin-top:20px;
+  }
+  .modal-title{font-family:'Fraunces',serif;font-size:22px;font-weight:700;margin:0 0 4px;}
+  .modal-sub{
+    font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--brass-deep);margin:0 0 20px;
+  }
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;
+  }
+  .field input, .field textarea, .field select{
+    width:100%;font-family:'Inter',sans-serif;font-size:15px;padding:10px 12px;
+    border:1px solid var(--line);border-radius:var(--radius);background:var(--card);color:var(--ink);outline:none;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{border-color:var(--brass);}
+  .field textarea{min-height:130px;resize:vertical;font-family:'Inter',sans-serif;line-height:1.5;}
+  .cat-input-row{display:flex;gap:8px;}
+  .cat-input-row select{flex:1;}
+  .cat-input-row input{flex:1;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;}
+  .btn{
+    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+    padding:10px 18px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--ink);
+  }
+  .btn-ghost{background:transparent;color:var(--ink);}
+  .btn-ghost:hover{background:#00000010;}
+  .btn-solid{background:var(--ink);color:var(--paper);}
+  .btn-solid:hover{background:var(--brass-deep);border-color:var(--brass-deep);}
+  .btn-solid:disabled{opacity:.5;cursor:not-allowed;}
+
+  .toast{
+    position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:12px;
+    padding:10px 18px;border-radius:var(--radius);opacity:0;pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;z-index:100;max-width:90vw;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* Login screen */
+  .login-screen{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .login-card{
+    background:var(--card);border:1px solid var(--ink);border-radius:var(--radius);
+    padding:40px 34px;max-width:380px;width:100%;text-align:center;
+  }
+  .login-card .brand-eyebrow{margin-bottom:10px;}
+  .login-card h1{font-size:28px;margin-bottom:10px;}
+  .login-card p{font-size:14px;color:var(--ink-soft);line-height:1.5;margin:0 0 26px;}
+  .google-btn{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--ink);color:var(--paper);border:none;
+    font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.03em;
+    padding:12px 22px;border-radius:var(--radius);cursor:pointer;
+    transition:background .15s ease;
+  }
+  .google-btn:hover{background:var(--brass-deep);}
+  .google-btn svg{flex-shrink:0;}
+  .login-error{
+    margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--danger);
+  }
+
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+  @media (max-width:520px){
+    .wrap{padding:20px 14px 100px;}
+    header{align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <p class="brand-eyebrow">Catálogo personal</p>
+    <h1>Índice de Prompts</h1>
+    <p>Inicia sesión con tu cuenta de Google para acceder a tu biblioteca de prompts desde cualquier dispositivo.</p>
+    <button class="google-btn" id="googleLoginBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.344-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/></svg>
+      Iniciar sesión con Google
+    </button>
+    <p class="login-error" id="loginError"></p>
+  </div>
+</div>
+
+<div class="wrap" id="wrap">
+  <header>
+    <div>
+      <p class="brand-eyebrow">Catálogo personal · Fichero A–Z</p>
+      <h1>Índice de Prompts</h1>
+    </div>
+    <div class="count-plate" id="countPlate">0 fichas</div>
+  </header>
+
+  <div class="account-row">
+    <div class="sync-status">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncText">Conectando…</span>
+    </div>
+    <div class="account-chip">
+      <img id="userPhoto" src="" alt="">
+      <span id="userName"></span>
+      <button id="logoutBtn">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="primary" id="openAddBtn">+ Nueva ficha</button>
+    <button id="exportBtn">Exportar</button>
+    <button id="importBtn">Importar</button>
+    <input type="file" id="importInput" accept="application/json">
+  </div>
+
+  <div class="catalog-controls">
+    <div class="search-row">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Buscar por título o contenido…">
+    </div>
+    <span class="cat-label">Categorías</span>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div id="gridWrap"></div>
+</div>
+
+<button class="fab" id="fabBtn" title="Añadir prompt" aria-label="Añadir prompt" style="display:none;">+</button>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <p class="modal-title" id="modalTitle">Nueva ficha</p>
+    <p class="modal-sub">Registro de prompt</p>
+    <div class="field">
+      <label for="fTitle">Título</label>
+      <input type="text" id="fTitle" placeholder="Ej: Resumen ejecutivo de reunión">
+    </div>
+    <div class="field">
+      <label for="fCategory">Categoría</label>
+      <div class="cat-input-row">
+        <select id="fCategorySelect"></select>
+        <input type="text" id="fCategoryNew" placeholder="…o escribe una nueva">
+      </div>
+    </div>
+    <div class="field">
+      <label for="fContent">Contenido del prompt</label>
+      <textarea id="fContent" placeholder="Escribe aquí el texto completo del prompt…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="cancelBtn">Cancelar</button>
+      <button class="btn btn-solid" id="saveBtn">Guardar ficha</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+  import {
+    getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+    onSnapshot, query, orderBy, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZHMIiv0ZTg1K8th3EN9xnqtcNcSYWPfE",
+    authDomain: "biblioteca-prompts-caca3.firebaseapp.com",
+    projectId: "biblioteca-prompts-caca3",
+    storageBucket: "biblioteca-prompts-caca3.firebasestorage.app",
+    messagingSenderId: "841448213365",
+    appId: "1:841448213365:web:15859f305a5d628066213c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  let uid = null;
+  let prompts = [];
+  let activeCategory = 'Todas';
+  let searchText = '';
+  let editingId = null;
+  let unsubscribe = null;
+
+  const loginScreen = document.getElementById('loginScreen');
+  const wrap = document.getElementById('wrap');
+  const fabBtn = document.getElementById('fabBtn');
+  const gridWrap = document.getElementById('gridWrap');
+  const chipsEl = document.getElementById('chips');
+  const countPlate = document.getElementById('countPlate');
+  const overlay = document.getElementById('overlay');
+  const toast = document.getElementById('toast');
+  const syncDot = document.getElementById('syncDot');
+  const syncText = document.getElementById('syncText');
+  const saveBtn = document.getElementById('saveBtn');
+  const loginError = document.getElementById('loginError');
+
+  function setSyncStatus(state, text){
+    syncDot.className = 'sync-dot' + (state ? ' ' + state : '');
+    syncText.textContent = text;
+  }
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 1800);
+  }
+
+  function callNumber(index){ return 'P-' + String(index+1).padStart(3,'0'); }
+  function promptsCollection(){ return collection(db, 'users', uid, 'prompts'); }
+
+  // ---- Login con Google ----
+  document.getElementById('googleLoginBtn').addEventListener('click', ()=>{
+    loginError.textContent = '';
+    signInWithPopup(auth, provider).catch((err)=>{
+      loginError.textContent = 'No se pudo iniciar sesión. Inténtalo de nuevo.';
+      console.error(err);
+    });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    signOut(auth);
+  });
+
+  onAuthStateChanged(auth, (user)=>{
+    if(user){
+      uid = user.uid;
+      loginScreen.style.display = 'none';
+      wrap.classList.add('visible');
+      fabBtn.style.display = 'flex';
+      document.getElementById('userPhoto').src = user.photoURL || '';
+      document.getElementById('userName').textContent = user.displayName || user.email || '';
+      setSyncStatus('online', 'Sincronizado');
+      saveBtn.disabled = false;
+      startListening();
+    }else{
+      uid = null;
+      prompts = [];
+      if(unsubscribe){ unsubscribe(); unsubscribe = null; }
+      loginScreen.style.display = 'flex';
+      wrap.classList.remove('visible');
+      fabBtn.style.display = 'none';
+    }
+  });
+
+  function startListening(){
+    if(unsubscribe) unsubscribe();
+    const q = query(promptsCollection(), orderBy('createdAt', 'asc'));
+    unsubscribe = onSnapshot(q, (snapshot)=>{
+      prompts = snapshot.docs.map(d=>({ id: d.id, ...d.data() }));
+      setSyncStatus('online', 'Sincronizado');
+      render();
+    }, (err)=>{
+      setSyncStatus('error', 'Error de sincronización');
+      console.error(err);
+    });
+  }
+
+  function getCategories(){
+    const set = new Set(prompts.map(p => p.category).filter(Boolean));
+    return Array.from(set).sort((a,b)=>a.localeCompare(b));
+  }
+
+  function renderChips(){
+    const cats = getCategories();
+    const all = ['Todas', ...cats];
+    chipsEl.innerHTML = '';
+    all.forEach(cat=>{
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (cat === activeCategory ? ' active' : '');
+      chip.textContent = cat;
+      chip.addEventListener('click', ()=>{ activeCategory = cat; render(); });
+      chipsEl.appendChild(chip);
+    });
+  }
+
+  function filteredPrompts(){
+    return prompts.filter(p=>{
+      const matchesCat = activeCategory === 'Todas' || p.category === activeCategory;
+      const t = searchText.trim().toLowerCase();
+      const matchesText = !t || (p.title||'').toLowerCase().includes(t) || (p.content||'').toLowerCase().includes(t);
+      return matchesCat && matchesText;
+    });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function render(){
+    renderChips();
+    const list = filteredPrompts();
+    countPlate.textContent = prompts.length + (prompts.length === 1 ? ' ficha' : ' fichas');
+
+    if(prompts.length === 0){
+      gridWrap.innerHTML = `<div class="empty"><h2>El catálogo está vacío</h2><p>Añade tu primer prompt con el botón «+ Nueva ficha».</p></div>`;
+      return;
+    }
+    if(list.length === 0){
+      gridWrap.innerHTML = `<div class="empty"><h2>Sin resultados</h2><p>Ninguna ficha coincide con la búsqueda o categoría seleccionada.</p></div>`;
+      return;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    list.forEach((p)=>{
+      const originalIndex = prompts.findIndex(x=>x.id === p.id);
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-top">
+          <span class="call-number">${callNumber(originalIndex)}</span>
+          <span class="card-cat">${escapeHtml(p.category || 'Sin categoría')}</span>
+        </div>
+        <h3>${escapeHtml(p.title)}</h3>
+        <p>${escapeHtml(p.content)}</p>
+        <div class="card-actions">
+          <button class="icon-btn copy-btn">Copiar</button>
+          <button class="icon-btn edit-btn">Editar</button>
+          <button class="icon-btn danger delete-btn">Eliminar</button>
+        </div>
+      `;
+      card.querySelector('.copy-btn').addEventListener('click', (e)=>{
+        navigator.clipboard.writeText(p.content).then(()=>{
+          const btn = e.target;
+          const original = btn.textContent;
+          btn.textContent = 'Copiado ✓';
+          btn.classList.add('copied');
+          setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1200);
+        });
+      });
+      card.querySelector('.edit-btn').addEventListener('click', ()=> openModal(p));
+      card.querySelector('.delete-btn').addEventListener('click', ()=> deletePrompt(p.id));
+      grid.appendChild(card);
+    });
+    gridWrap.innerHTML = '';
+    gridWrap.appendChild(grid);
+  }
+
+  async function deletePrompt(id){
+    if(!confirm('¿Eliminar esta ficha del catálogo?')) return;
+    try{
+      await deleteDoc(doc(db, 'users', uid, 'prompts', id));
+      showToast('Ficha eliminada');
+    }catch(e){
+      showToast('No se pudo eliminar');
+    }
+  }
+
+  function populateCategorySelect(){
+    const sel = document.getElementById('fCategorySelect');
+    sel.innerHTML = '<option value="">— elegir existente —</option>';
+    getCategories().forEach(c=>{
+      const opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      sel.appendChild(opt);
+    });
+  }
+
+  function openModal(prompt){
+    editingId = prompt ? prompt.id : null;
+    document.getElementById('modalTitle').textContent = prompt ? 'Editar ficha' : 'Nueva ficha';
+    populateCategorySelect();
+    document.getElementById('fTitle').value = prompt ? prompt.title : '';
+    document.getElementById('fContent').value = prompt ? prompt.content : '';
+    document.getElementById('fCategoryNew').value = '';
+    document.getElementById('fCategorySelect').value = prompt ? (prompt.category || '') : '';
+    overlay.classList.add('open');
+    document.getElementById('fTitle').focus();
+  }
+
+  function closeModal(){
+    overlay.classList.remove('open');
+    editingId = null;
+  }
+
+  async function saveFromModal(){
+    const title = document.getElementById('fTitle').value.trim();
+    const content = document.getElementById('fContent').value.trim();
+    const newCat = document.getElementById('fCategoryNew').value.trim();
+    const selectedCat = document.getElementById('fCategorySelect').value;
+    const category = newCat || selectedCat || 'Sin categoría';
+
+    if(!title || !content){
+      showToast('Título y contenido son obligatorios');
+      return;
+    }
+    if(!uid){
+      showToast('Todavía conectando, espera un segundo');
+      return;
+    }
+
+    try{
+      if(editingId){
+        await updateDoc(doc(db, 'users', uid, 'prompts', editingId), { title, content, category });
+        showToast('Ficha actualizada');
+      }else{
+        await addDoc(promptsCollection(), { title, content, category, createdAt: serverTimestamp() });
+        showToast('Ficha añadida');
+      }
+      closeModal();
+    }catch(e){
+      showToast('No se pudo guardar');
+      console.error(e);
+    }
+  }
+
+  document.getElementById('openAddBtn').addEventListener('click', ()=>openModal(null));
+  fabBtn.addEventListener('click', ()=>openModal(null));
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+  saveBtn.addEventListener('click', saveFromModal);
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeModal(); });
+
+  document.getElementById('searchInput').addEventListener('input', (e)=>{
+    searchText = e.target.value;
+    render();
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(prompts, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'biblioteca-prompts.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Exportado');
+  });
+
+  document.getElementById('importBtn').addEventListener('click', ()=>{
+    document.getElementById('importInput').click();
+  });
+
+  document.getElementById('importInput').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev)=>{
+      try{
+        const imported = JSON.parse(ev.target.result);
+        if(!Array.isArray(imported)) throw new Error('Formato inválido');
+        const cleaned = imported.filter(p=>p && p.title && p.content);
+        for(const p of cleaned){
+          await addDoc(promptsCollection(), {
+            title: String(p.title),
+            content: String(p.content),
+            category: p.category ? String(p.category) : 'Sin categoría',
+            createdAt: serverTimestamp()
+          });
+        }
+        showToast('Importado: ' + cleaned.length + ' fichas');
+      }catch(err){
+        showToast('El archivo no es un JSON válido');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
+  });
+
+  saveBtn.disabled = true;
+  render();
+</script>
+
+</body>
+</html>
